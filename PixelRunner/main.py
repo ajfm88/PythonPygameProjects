@@ -11,8 +11,11 @@ sky_surface = pygame.image.load('PixelRunner\graphics\Sky.png').convert()
 ground_surface = pygame.image.load('PixelRunner\graphics\ground.png').convert()
 text_surface = test_font.render('My game', False, 'Black')
 
-snail_surface = pygame.image.load('PixelRunner\graphics\snail\snail1.png').convert_alpha()
-snail_x_position = 600
+snail_surf = pygame.image.load('PixelRunner\graphics\snail\snail1.png').convert_alpha()
+snail_rect = snail_surf.get_rect(bottomright = (600, 300)) # Bottom of the snail has to be in the same position as ground_surface
+
+player_surf = pygame.image.load('PixelRunner\graphics\Player\player_walk_1.png').convert_alpha()
+player_rect = player_surf.get_rect(midbottom = (80, 300)) #It takes a surface and draws a rectangle around it
 
 while True:
     for event in pygame.event.get():
@@ -23,10 +26,12 @@ while True:
     screen.blit(sky_surface,(0,0))
     screen.blit(ground_surface,(0,300))
     screen.blit(text_surface,(300,50))
-    snail_x_position -= 4
-    if snail_x_position < -100:
-        snail_x_position = 800
-    screen.blit(snail_surface,(snail_x_position, 265))
+
+    snail_rect.x -= 4
+    if snail_rect.right <= 0: snail_rect.left = 800
+    screen.blit(snail_surf,snail_rect)
+    #In pygame you don't move the surface, you move the rectangle that contains the surface
+    screen.blit(player_surf,player_rect) # We are taking the player surface and we are placing it in the position of this rectangle
 
     pygame.display.update()
     clock.tick(60)
