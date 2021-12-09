@@ -22,16 +22,24 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        # if event.type == pygame.MOUSEMOTION: #Using the event loop to check if the mouse collides with the player rectangle
+        #     if player_rect.collidepoint(event.pos): print('collision')
 
     screen.blit(sky_surface,(0,0))
     screen.blit(ground_surface,(0,300))
     screen.blit(text_surface,(300,50))
 
     snail_rect.x -= 4
-    if snail_rect.right <= 0: snail_rect.left = 800
+    if snail_rect.right <= 0: snail_rect.left = 800     #In pygame you don't move the surface, you move the rectangle that contains the surface
     screen.blit(snail_surf,snail_rect)
-    #In pygame you don't move the surface, you move the rectangle that contains the surface
     screen.blit(player_surf,player_rect) # We are taking the player surface and we are placing it in the position of this rectangle
+
+    # if player_rect.colliderect(snail_rect):
+    #     print('collision')
+
+    # mouse_pos = pygame.mouse.get_pos() #Getting the current position of the mouse
+    # if player_rect.collidepoint(mouse_pos):
+    #     print(pygame.mouse.get_pressed()) #Which mouse button is pressed
 
     pygame.display.update()
     clock.tick(60)
