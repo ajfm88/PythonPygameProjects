@@ -50,13 +50,13 @@ pygame.mouse.set_visible(False)
 font = pygame.font.SysFont(None, 48)
 
 # Set up sounds.
-gameOverSound = pygame.mixer.Sound('gameover.wav')
-pygame.mixer.music.load('background.mid')
+gameOverSound = pygame.mixer.Sound('Dodger\gameover.wav')
+pygame.mixer.music.load('Dodger\\background.mid')
 
 # Set up images.
-playerImage = pygame.image.load('player.png')
+playerImage = pygame.image.load('Dodger\player.png')
 playerRect = playerImage.get_rect()
-baddieImage = pygame.image.load('baddie.png')
+baddieImage = pygame.image.load('Dodger\\baddie.png')
 
 # Show the "Start" screen.
 windowSurface.fill(BACKGROUNDCOLOR)
@@ -156,3 +156,42 @@ while True:
             elif slowCheat:
                 b['rect'].move_ip(0, 1)
                 
+        # Delete baddies that have fallen past the bottom.
+        for b in baddies[:]:
+            if b['rect'].top > WINDOWHEIGHT:
+                baddies.remove(b)
+
+        # Draw the game world on the window.
+        windowSurface.fill(BACKGROUNDCOLOR)
+
+        # Draw the score and top score.
+        drawText('Score: %s' % (score), font, windowSurface, 10, 0)
+        drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
+
+        # Draw the player's rectangle.
+        windowSurface.blit(playerImage, playerRect)
+
+        # Draw each baddie.
+        for b in baddies:
+            windowSurface.blit(b['surface'], b['rect'])
+
+        pygame.display.update()
+
+        # Check if any of the baddies have hit the player.
+        if playerHasHitBaddie(playerRect, baddies):
+            if score > topScore:
+                topScore = score # Set new top score.
+            break
+
+        mainClock.tick(FPS)
+
+    # Stop the game and show the "Game Over screen".
+    pygame.mixer.music.stop()
+    gameOverSound.play()
+
+    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
+    drawText('Press a key to play again', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
+    pygame.display.update()
+    waitForPlayerToPressKey()
+
+    gameOverSound.stop()
