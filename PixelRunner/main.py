@@ -14,24 +14,23 @@ score_surf = test_font.render('My game', False, (64,64,64))
 score_rect = score_surf.get_rect(center = (400,50))
 
 snail_surf = pygame.image.load('PixelRunner\graphics\snail\snail1.png').convert_alpha()
-snail_rect = snail_surf.get_rect(bottomright = (600, 300)) # Bottom of the snail has to be in the same position as ground_surface
+snail_rect = snail_surf.get_rect(bottomright = (600, 300))
 
 player_surf = pygame.image.load('PixelRunner\graphics\Player\player_walk_1.png').convert_alpha()
-player_rect = player_surf.get_rect(midbottom = (80, 300)) #It takes a surface and draws a rectangle around it
+player_rect = player_surf.get_rect(midbottom = (80, 300))
+player_gravity = 0
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        # if event.type == pygame.MOUSEMOTION: #Using the event loop to check if the mouse collides with the player rectangle
-        #     if player_rect.collidepoint(event.pos): print('collision')
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if player_rect.collidepoint(event.pos):
+                player_gravity = -20                
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                print('jump again')
-
-        if event.type == pygame.KEYUP:
-            print('keyup')
+                player_gravity = -20
 
     screen.blit(sky_surface,(0,0))
     screen.blit(ground_surface,(0,300))
@@ -40,20 +39,13 @@ while True:
     screen.blit(score_surf,score_rect)
 
     snail_rect.x -= 4
-    if snail_rect.right <= 0: snail_rect.left = 800     #In pygame you don't move the surface, you move the rectangle that contains the surface
+    if snail_rect.right <= 0: snail_rect.left = 800
     screen.blit(snail_surf,snail_rect)
-    screen.blit(player_surf,player_rect) # We are taking the player surface and we are placing it in the position of this rectangle
 
-    # keys = pygame.key.get_pressed()
-    # if keys[pygame.K_SPACE]:
-    #     print('jump')
-
-    # if player_rect.colliderect(snail_rect):
-    #     print('collision')
-
-    # mouse_pos = pygame.mouse.get_pos() #Getting the current position of the mouse
-    # if player_rect.collidepoint(mouse_pos):
-    #     print(pygame.mouse.get_pressed()) #Which mouse button is pressed
+    # Player
+    player_gravity += 1 # In every cycle of the game loop we will increase gravity by a bit.
+    player_rect.y += player_gravity
+    screen.blit(player_surf,player_rect)
 
     pygame.display.update()
     clock.tick(60)
