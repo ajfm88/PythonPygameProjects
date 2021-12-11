@@ -26,10 +26,10 @@ while True:
             pygame.quit()
             exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if player_rect.collidepoint(event.pos):
+            if player_rect.collidepoint(event.pos) and player_rect.bottom >= 300: #Making sure player can only jump when touching the ground
                 player_gravity = -20                
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE and player_rect.bottom >= 300: #Stops the player from flying by double jump
                 player_gravity = -20
 
     screen.blit(sky_surface,(0,0))
@@ -45,6 +45,7 @@ while True:
     # Player
     player_gravity += 1 # In every cycle of the game loop we will increase gravity by a bit.
     player_rect.y += player_gravity
+    if player_rect.bottom >= 300: player_rect.bottom = 300 #Gravity.
     screen.blit(player_surf,player_rect)
 
     pygame.display.update()
