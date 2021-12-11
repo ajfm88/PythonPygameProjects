@@ -26,6 +26,12 @@ while True:
             exit()
         # if event.type == pygame.MOUSEMOTION: #Using the event loop to check if the mouse collides with the player rectangle
         #     if player_rect.collidepoint(event.pos): print('collision')
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                print('jump again')
+
+        if event.type == pygame.KEYUP:
+            print('keyup')
 
     screen.blit(sky_surface,(0,0))
     screen.blit(ground_surface,(0,300))
@@ -37,6 +43,10 @@ while True:
     if snail_rect.right <= 0: snail_rect.left = 800     #In pygame you don't move the surface, you move the rectangle that contains the surface
     screen.blit(snail_surf,snail_rect)
     screen.blit(player_surf,player_rect) # We are taking the player surface and we are placing it in the position of this rectangle
+
+    # keys = pygame.key.get_pressed()
+    # if keys[pygame.K_SPACE]:
+    #     print('jump')
 
     # if player_rect.colliderect(snail_rect):
     #     print('collision')
