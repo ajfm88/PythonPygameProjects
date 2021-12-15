@@ -86,7 +86,7 @@ while True:
         if event.type == MOUSEBUTTONUP:
             foods.append(pygame.Rect(event.pos[0] - 10, event.pos[1] - 10, 20, 20))
 
-    foodCounter += 1
+    foodCounter = foodCounter + 1
     if foodCounter >= NEWFOOD:
         # Add new food.
         foodCounter = 0
