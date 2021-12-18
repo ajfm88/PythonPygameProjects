@@ -1,6 +1,77 @@
 import pygame
 from sys import exit
-from random import randint
+from random import randint, choice
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__() # We are initializing the sprite class right inside this class, so that we can access it.
+        player_walk_1 = pygame.image.load('PixelRunner\graphics\Player\player_walk_1.png').convert_alpha()
+        player_walk_2 = pygame.image.load('PixelRunner\graphics\Player\player_walk_2.png').convert_alpha()
+        self.player_walk = [player_walk_1,player_walk_2] # This needs self because we want to access it outside of the init method.
+        self.player_index = 0 # We will use it later to pick either the 1st or 2nd walk surface.
+        self.player_jump = pygame.image.load('PixelRunner\graphics\Player\jump.png').convert_alpha()
+
+        self.image = self.player_walk[self.player_index]
+        self.rect = self.image.get_rect(midbottom = (80, 300))
+        self.gravity = 0
+
+    def player_input(self):
+        keys = pygame.key.get_pressed() #This gets us all of the keys input.
+        if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
+            self.gravity = -20
+
+    def apply_gravity(self):
+        self.gravity += 1
+        self.rect.y += self.gravity
+        if self.rect.bottom >= 300:
+            self.rect.bottom = 300
+
+    def animation_state(self):
+        if self.rect.bottom < 300: # display the jump surface when player is not on the floor
+            self.image = self.player_jump
+        else: # play walking animation if the player is on floor
+            self.player_index += 0.1 #Gently change from 0 to 1 so that the animation changes every two frames
+            if self.player_index >= len(self.player_walk):self.player_index = 0
+            self.image = self.player_walk[int(self.player_index)]
+        
+    def update(self):
+        self.player_input()
+        self.apply_gravity()
+        self.animation_state()
+
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self,type):
+        super().__init__()
+
+        if type == 'fly':
+            fly_1 = pygame.image.load('PixelRunner\graphics\Fly\Fly1.png').convert_alpha()
+            fly_2 = pygame.image.load('PixelRunner\graphics\Fly\Fly2.png').convert_alpha()
+            self.frames = [fly_1, fly_2]
+            y_pos = 210
+        else:
+            snail_1 = pygame.image.load('PixelRunner\graphics\snail\snail1.png').convert_alpha()
+            snail_2 = pygame.image.load('PixelRunner\graphics\snail\snail2.png').convert_alpha()
+            self.frames = [snail_frame_1, snail_frame_2]
+            y_pos = 300
+
+        self.animation_index = 0
+        self.image = self.frames[self.animation_index]
+        self.rect = self.image.get_rect(midbottom = (randint(900,1100),y_pos))
+
+    def animation_state(self):
+        self.animation_index += 0.1 #We could set this differently depending on whether we get a snail or a fly
+        if self.animation_index >= len(self.frames): self.animation_index = 0
+        self.image = self.frames[int(player_index)]
+
+    def update(self):
+        self.animation_state()
+        self.rect.x -= 6 # Moving the sprite to the left
+        self.destroy()
+
+    def destroy(self):
+        if self.rect.x <= -100:
+            self.kill()
+
 
 def display_score():
     current_time = int(pygame.time.get_ticks() / 1000) - start_time
@@ -28,8 +99,14 @@ def collisions(player,obstacles):
             if player.colliderect(obstacle_rect): return False
     return True
 
+def collision_sprite():
+    if pygame.sprite.spritecollide(player.sprite,obstacle_group,False): # IF the first sprite is collided with the second sprite, the boolean determines if the 2nd sprite gets deleted
+        obstacle_group.empty() # Empties the enemies, so that when we reset our game, the player is not instantly killed right away
+        return False
+    else: return True
+
 def player_animation():
-    global player_surf, player_index # We want to work outside of this function. These are the two variables that we have to influence outside of the function
+    global player_surf, player_index # We don't need the global methods anymore, because now we can work with self
 
     if player_rect.bottom < 300: # display the jump surface when player is not on the floor
         player_surf = player_jump
@@ -46,6 +123,12 @@ test_font = pygame.font.Font('PixelRunner\\font\Pixeltype.ttf', 50)
 game_active = False
 start_time = 0
 score = 0
+
+# Groups
+player = pygame.sprite.GroupSingle() #The player and the obstacles need to be in different groups because we need to check the collision between them.
+player.add(Player()) #Adding an instance of player into the GroupSingle player
+
+obstacle_group = pygame.sprite.Group()
 
 sky_surface = pygame.image.load('PixelRunner\graphics\Sky.png').convert()
 ground_surface = pygame.image.load('PixelRunner\graphics\ground.png').convert()
@@ -123,10 +206,11 @@ while True:
         
         if game_active:
             if event.type == obstacle_timer:
-                if randint(0,2):
-                    obstacle_rect_list.append(snail_surf.get_rect(bottomright = (randint(900,1100),300)))
-                else:
-                    obstacle_rect_list.append(fly_surf.get_rect(bottomright = (randint(900,1100),210)))
+                obstacle_group.add(Obstacle(choice(['fly','snail','snail'])))
+                # if randint(0,2):
+                #     obstacle_rect_list.append(snail_surf.get_rect(bottomright = (randint(900,1100),300)))
+                # else:
+                #     obstacle_rect_list.append(fly_surf.get_rect(bottomright = (randint(900,1100),210)))
 
             if event.type == snail_animation_timer:
                 if snail_frame_index == 0: snail_frame_index = 1
@@ -137,6 +221,7 @@ while True:
                 if fly_frame_index == 0: fly_frame_index = 1
                 else: fly_frame_index = 0
                 fly_surf = fly_frames[fly_frame_index]
+
 
     if game_active:
         screen.blit(sky_surface,(0,0))
@@ -151,17 +236,23 @@ while True:
         # screen.blit(snail_surf,snail_rect)
 
         # Player
-        player_gravity += 1
-        player_rect.y += player_gravity
-        if player_rect.bottom >= 300: player_rect.bottom = 300
-        player_animation()
-        screen.blit(player_surf,player_rect)
+        # player_gravity += 1
+        # player_rect.y += player_gravity
+        # if player_rect.bottom >= 300: player_rect.bottom = 300
+        # player_animation()
+        # screen.blit(player_surf,player_rect)
+        player.draw(screen) # Sprite groups in pygame have two main functions. Draw all of the sprites 
+        player.update() # Update all of the sprites.
+
+        obstacle_group.draw(screen) # Draws the sprite
+        obstacle_group.update() # Updates the sprite
 
         # Obstacle movement
-        obstacle_rect_list = obstacle_movement(obstacle_rect_list)
+        # obstacle_rect_list = obstacle_movement(obstacle_rect_list)
 
         # collision
-        game_active = collisions(player_rect,obstacle_rect_list)
+        game_active = collision_sprite()
+        # game_active = collisions(player_rect,obstacle_rect_list)
 
     else: # Game Over screen
         screen.fill((94, 129,162))
