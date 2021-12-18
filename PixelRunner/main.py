@@ -15,10 +15,14 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = (80, 300))
         self.gravity = 0
 
+        self.jump_sound = pygame.mixer.Sound('PixelRunner\\audio\jump.mp3')
+        self.jump_sound.set_volume(0.5)
+
     def player_input(self):
         keys = pygame.key.get_pressed() #This gets us all of the keys input.
         if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
             self.gravity = -20
+            self.jump_sound.play()
 
     def apply_gravity(self):
         self.gravity += 1
@@ -123,6 +127,8 @@ test_font = pygame.font.Font('PixelRunner\\font\Pixeltype.ttf', 50)
 game_active = False
 start_time = 0
 score = 0
+bg_music = pygame.mixer.Sound('PixelRunner\\audio\music.wav')
+bg_music.play(-1, 0.0)
 
 # Groups
 player = pygame.sprite.GroupSingle() #The player and the obstacles need to be in different groups because we need to check the collision between them.
