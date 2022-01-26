@@ -1,13 +1,17 @@
 from cgi import test
-import pygame, sys
+import pygame
+import sys
 from settings import *
 from level import Level
 
-# Pygame setup
+# note from quasar098: it would be cool to this but multiplayer with either pickle or socket modules
+
+# pygame setup
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
-level = Level(level_map,screen)
+level = Level(level_map, screen)
+pygame.display.set_caption("Treasure Hunters")
 
 while True:
     for event in pygame.event.get():
@@ -19,4 +23,5 @@ while True:
     level.run()
 
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(75)
+    # change this to match your refresh rate

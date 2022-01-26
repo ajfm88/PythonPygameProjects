@@ -35,7 +35,7 @@ class Level:
         if player_x < screen_width / 4 and direction_x < 0:
             self.world_shift = 8
             player.speed = 0
-        elif player_x > screen_width - (screen_width / 4) and direction_x > 0:
+        elif player_x > screen_width - (screen_width / 2) and direction_x > 0:
             self.world_shift = -8
             player.speed = 0
         else:
@@ -57,23 +57,25 @@ class Level:
         player = self.player.sprite
         player.apply_gravity()
 
+        self.player.sprites()[0].grounded = False
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(player.rect):
                 if player.direction.y > 0:
                     player.rect.bottom = sprite.rect.top
-                    player.direction.y = 0 #Cancels out gravity increse.
+                    self.player.sprites()[0].grounded = True
+                    player.direction.y = 0  # Cancels out gravity increse.
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
 
     def run(self):
 
-        #level tiles
+        # level tiles
         self.tiles.update(self.world_shift)
         self.tiles.draw(self.display_surface)
         self.scroll_x()
 
-        #player
+        # player
         self.player.update()
         self.horizontal_movement_collision()
         self.vertical_movement_collision()
