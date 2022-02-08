@@ -32,7 +32,7 @@ class Player(pygame.sprite.Sprite):
 		self.on_right = False
 
 	def import_character_assets(self):
-		character_path = 'TreasureHunters/graphics/character/'
+		character_path = 'graphics/character/'
 		self.animations = {'idle':[],'run':[],'jump':[],'fall':[]}
 
 		for animation in self.animations.keys():
@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
 			self.animations[animation] = import_folder(full_path)
 
 	def import_dust_run_particles(self):
-		self.dust_run_particles = import_folder('TreasureHunters/graphics/character/dust_particles/run')
+		self.dust_run_particles = import_folder('graphics/character/dust_particles/run')
 
 	def animate(self):
 		animation = self.animations[self.status]
